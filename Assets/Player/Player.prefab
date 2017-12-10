@@ -189,6 +189,7 @@ GameObject:
   - component: {fileID: 136376125922698398}
   - component: {fileID: 114638825080145868}
   - component: {fileID: 114251892314664634}
+  - component: {fileID: 114717796859057584}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2497,6 +2498,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkMoveStopRadius: 0.2
+  attackMoveStopRadius: 5
 --- !u!114 &114638825080145868
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2516,6 +2518,18 @@ MonoBehaviour:
   m_MoveSpeedMultiplier: 0.7
   m_AnimSpeedMultiplier: 1.5
   m_GroundCheckDistance: 0.3
+--- !u!114 &114717796859057584
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1107952123878212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7381e3f932734d344b9a31a0b5ee48c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealthPoints: 100
 --- !u!136 &136376125922698398
 CapsuleCollider:
   m_ObjectHideFlags: 1
