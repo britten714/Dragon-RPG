@@ -13,10 +13,15 @@ public class CursorAffordance : MonoBehaviour
 	void Start ()
 	{
 	    cameraRaycaster = GetComponent<CameraRaycaster>();
+	    cameraRaycaster.layerChangeObservers += OnLayerChange;   //registering
 	}
-	
+
+
     //그냥 Update()로 하면 게임 시작 시에 default로 되어서 로그에러가 발생한다. 그거 없애주려고 LateUpdate()로 바꾼 것. 
-	void LateUpdate () {
+    //델리게이트로 바꾼다!
+    void OnLayerChange()
+    {
+        print("Cursor over new layer");
 	    switch (cameraRaycaster.currentLayerHit)
 	    {
             case Layer.Walkable:
@@ -32,7 +37,6 @@ public class CursorAffordance : MonoBehaviour
                 Debug.LogError("Don't know what cursor to show");
                 return;
 
-        }
-		
+        }		
 	}
 }
