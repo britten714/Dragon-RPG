@@ -6,10 +6,11 @@ using UnityStandardAssets.Characters.ThirdPerson;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float walkMoveStopRadius = 0.2f;
+    [SerializeField] private float attackMoveStopRadius = 5f;
 
     ThirdPersonCharacter thirdPersonCharacter;   // A reference to the ThirdPersonCharacter on the object. 멤버라서 앞에 m_를 붙인거다. 
     CameraRaycaster cameraRaycaster;
-    Vector3 currentClickTarget;
+    private Vector3 currentDestination, clickPoint;
 
     private bool isInDirectMode = false; // TODO consider making static later (이렇게 하는 이유는 개념상 static이 맞지만 현재로서는 private 만으로도 충분하기 때문)
 
@@ -17,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     {
         cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
         thirdPersonCharacter = GetComponent<ThirdPersonCharacter>();
-        currentClickTarget = transform.position;
+        currentDestination = transform.position;
     }
 
     private void FixedUpdate()
@@ -25,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G)) //G for gamepad. TODO add to menu. 
         {
             isInDirectMode = !isInDirectMode; //toggle mode
-            currentClickTarget = transform.position;    //clear the clickTarget. 이 줄을 추가해야 마우스 -> 키보드 -> 마우스로 바꿨을 때 이전 마우스 장소로 캐릭터가 이동하지 않는다. 
+            currentDestination = transform.position;    //clear the clickTarget. 이 줄을 추가해야 마우스 -> 키보드 -> 마우스로 바꿨을 때 이전 마우스 장소로 캐릭터가 이동하지 않는다. 
         }
 
         if (isInDirectMode)
@@ -55,28 +56,54 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
+            clickPoint = cameraRaycaster.hit.point;
             switch (cameraRaycaster.currentLayerHit)
             {
                 case Layer.Walkable:
-                    currentClickTarget = cameraRaycaster.hit.point;
+                    currentDestination = ShortDestination(clickPoint, walkMoveStopRadius);
                     break;
                 case Layer.Enemy:
-                    print("Not moving to enemy");
+                    currentDestination = ShortDestination(clickPoint, attackMoveStopRadius);
                     break;
                 default:
                     print("Unexpected layer found");
                     return;
             }
         }
-        var playerToClickPoint = currentClickTarget - transform.position;
+
+        WalkToDestination();
+    }
+
+    private void WalkToDestination()
+    {
+        var playerToClickPoint = currentDestination - transform.position;
         if (playerToClickPoint.magnitude >= walkMoveStopRadius)
         {
-            thirdPersonCharacter.Move(currentClickTarget - transform.position, false, false);
+            thirdPersonCharacter.Move(currentDestination - transform.position, false, false);
         }
         else
         {
             thirdPersonCharacter.Move(Vector3.zero, false, false);
         }
+    }
+
+    Vector3 ShortDestination(Vector3 destination, float shortening)
+    {
+        Vector3 reductionVector = (destination - transform.position).normalized * shortening;
+        return destination - reductionVector;
+    }
+
+    void OnDrawGizmos()
+    {
+        //Draw movement Gizmos
+        Gizmos.color = Color.black;
+        Gizmos.DrawLine(transform.position, clickPoint);
+        Gizmos.DrawSphere(currentDestination, 0.1f);
+        Gizmos.DrawSphere(clickPoint, 0.2f);
+
+        //Draw attack sphere
+        Gizmos.color = new Color(255f, 0f, 0, 0.5f);
+        Gizmos.DrawWireSphere(transform.position, attackMoveStopRadius);
     }
 }
 
